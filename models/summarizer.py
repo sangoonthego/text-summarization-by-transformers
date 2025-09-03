@@ -6,11 +6,14 @@ import torch
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM # call API, model from Hugging Face Transformers 
 from constraints import max_len, min_len, do_sample, chunk_size, temperature, top_k, top_p
 
+model_name="sshleifer/distilbart-cnn-12-6"
+# model_name = "facebook/bart-large-cnn"
+
 class TextSummarizer:
     def __init__(self):
         pass
 
-    def __init__(self, model_name="sshleifer/distilbart-cnn-12-6", cache_dir="./models_cache"):
+    def __init__(self, model_name=model_name, cache_dir="./models_cache"):
         # self.summarizer = pipeline("summarization", model=model_name, cache_dir=cache_dir)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
