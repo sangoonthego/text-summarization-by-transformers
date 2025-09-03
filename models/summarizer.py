@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import torch
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM # call API, model from Hugging Face Transformers 
 from constraints import max_len, min_len, do_sample, chunk_size, temperature, top_k, top_p
 
@@ -9,15 +10,20 @@ class TextSummarizer:
     def __init__(self):
         pass
 
-    def __init__(self, model_name="facebook/bart-large-cnn", cache_dir="./models_cache"):
+    def __init__(self, model_name="sshleifer/distilbart-cnn-12-6", cache_dir="./models_cache"):
         # self.summarizer = pipeline("summarization", model=model_name, cache_dir=cache_dir)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name, device_map="auto", torch_dtype="auto")
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name, cache_dir=cache_dir)
+        self.model.to(self.device)
+        self.model.eval()
 
     def summarize(self, text, max_len=max_len, min_len=min_len, temperature=temperature, top_k=top_k, top_p=top_p):
-        inputs = self.tokenizer([text], return_tensors="pt", truncation=True)
+        inputs = self.tokenizer([text], return_tensors="pt", truncation=True).to(self.device)
+
         outputs = self.model.generate(
-            inputs["input_ids"],
+            # inputs["input_ids"],
+            **inputs,
             max_length=max_len,
             min_length=min_len,
             temperature=temperature,
