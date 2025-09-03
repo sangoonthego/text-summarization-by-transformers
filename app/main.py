@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from models.summarizer import TextSummarizer
 from utils import text_preprocess, file_reader
-from constraints import max_len, min_len, temperature, top_k, top_p
+from constraints import max_len, min_len, temperature, top_k, top_p, chunk_size
 
 summarizer = TextSummarizer()
 
@@ -27,7 +27,8 @@ if st.button("Summarize"):
 
     if raw_text:
         with st.spinner("Summarizing..."):
-            summary = summarizer.summarize(raw_text, max_len, min_len, temperature, top_k, top_p)
+            # summary = summarizer.summarize(raw_text, max_len, min_len, temperature, top_k, top_p)
+            summary = summarizer.chunk_text(raw_text, chunk_size=chunk_size)
         st.success("Summariztion Result: ")
         st.write(summary)
     else:
